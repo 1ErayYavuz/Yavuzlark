@@ -383,21 +383,94 @@ async function savePricesWithDatabase(data: any) {
 }
 
 // Helper for PIN Auth
-function checkPin(submittedPin: string): boolean {
-  if (fs.existsSync(AUTH_FILE)) {
+async function checkPin(submittedPin: string): Promise<boolean> {
+  const localFallback = () => {
+    if (fs.existsSync(AUTH_FILE)) {
+      try {
+        const authData = JSON.parse(fs.readFileSync(AUTH_FILE, "utf-8"));
+        return authData.pin === submittedPin;
+      } catch (e) {
+        console.error("Error reading auth file, falling back to default PIN.", e);
+      }
+    }
+    return submittedPin === DEFAULT_PIN;
+  };
+
+  // 1. Try Supabase first if configured
+  const supabase = getSupabase();
+  if (supabase) {
     try {
-      const authData = JSON.parse(fs.readFileSync(AUTH_FILE, "utf-8"));
-      return authData.pin === submittedPin;
-    } catch (e) {
-      console.error("Error reading auth file, falling back to default PIN.", e);
+      const { data, error } = await supabase
+        .from("prices")
+        .select("data")
+        .eq("id", "auth")
+        .maybeSingle();
+
+      if (!error && data && data.data && data.data.pin) {
+        return data.data.pin === submittedPin;
+      }
+    } catch (err) {
+      console.error("Failed to check PIN in Supabase, trying fallback:", err);
     }
   }
-  return submittedPin === DEFAULT_PIN;
+
+  // 2. Try Firestore if configured
+  try {
+    const db = getDb();
+    if (db) {
+      const docRef = doc(db, "prices", "auth");
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const dbData = docSnap.data();
+        if (dbData && dbData.pin) {
+          return dbData.pin === submittedPin;
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Failed to check PIN in Firestore, trying fallback:", err);
+  }
+
+  return localFallback();
 }
 
 // Helper to save PIN
-function updatePin(newPin: string) {
-  fs.writeFileSync(AUTH_FILE, JSON.stringify({ pin: newPin }), "utf-8");
+async function updatePin(newPin: string): Promise<void> {
+  // 1. Keep local file up-to-date
+  try {
+    fs.writeFileSync(AUTH_FILE, JSON.stringify({ pin: newPin }), "utf-8");
+  } catch (e) {
+    console.error("Failed to save PIN locally:", e);
+  }
+
+  // 2. Try to store to Supabase if configured
+  const supabase = getSupabase();
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from("prices")
+        .upsert({ id: "auth", data: { pin: newPin } });
+      if (error) {
+        console.error("Failed to save PIN to Supabase:", error.message);
+      } else {
+        console.log("PIN successfully saved to Supabase.");
+      }
+    } catch (err) {
+      console.error("Failed to save PIN to Supabase:", err);
+    }
+  }
+
+  // 3. Try to store to central Firestore database
+  try {
+    const db = getDb();
+    if (db) {
+      const docRef = doc(db, "prices", "auth");
+      await setDoc(docRef, { pin: newPin });
+      console.log("PIN successfully saved to central Firestore database.");
+    }
+  } catch (err) {
+    console.error("Failed to save PIN to central Firestore database:", err);
+  }
 }
 
 // Initialize Gemini Client dynamically to pick up GEMINI_API_KEY1 or GEMINI_API_KEY at request time if set in Secrets
@@ -429,39 +502,50 @@ app.get("/api/prices", async (req, res) => {
 });
 
 // 2. Validate PIN Auth
-app.post("/api/auth/verify", (req, res) => {
+app.post("/api/auth/verify", async (req, res) => {
   const { pin } = req.body;
   if (!pin) {
     return res.status(400).json({ success: false, error: "Geçersiz PIN girdisi." });
   }
-  const isCorrect = checkPin(String(pin));
-  res.json({ success: isCorrect });
+  try {
+    const isCorrect = await checkPin(String(pin));
+    res.json({ success: isCorrect });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: "Doğrulama esnasında hata oluştu.", details: err.message });
+  }
 });
 
 // 3. Update PIN
-app.post("/api/auth/update-pin", (req, res) => {
+app.post("/api/auth/update-pin", async (req, res) => {
   const { currentPin, newPin } = req.body;
   if (!currentPin || !newPin) {
     return res.status(400).json({ error: "Eksik parametreler." });
   }
-  if (!checkPin(String(currentPin))) {
-    return res.status(403).json({ error: "Mevcut şifre/PIN kodunuz hatalı." });
+  try {
+    const isCurrentCorrect = await checkPin(String(currentPin));
+    if (!isCurrentCorrect) {
+      return res.status(403).json({ error: "Mevcut şifre/PIN kodunuz hatalı." });
+    }
+    if (String(newPin).length < 4) {
+      return res.status(400).json({ error: "Yeni PIN en az 4 karakter uzunluğunda olmalıdır." });
+    }
+    
+    await updatePin(String(newPin));
+    res.json({ success: true, message: "Yönetici şifreniz başarıyla güncellendi!" });
+  } catch (err: any) {
+    res.status(500).json({ error: "Şifre güncellenirken hata oluştu.", details: err.message });
   }
-  if (String(newPin).length < 4) {
-    return res.status(400).json({ error: "Yeni PIN en az 4 karakter uzunluğunda olmalıdır." });
-  }
-  
-  updatePin(String(newPin));
-  res.json({ success: true, message: "Yönetici şifreniz başarıyla güncellendi!" });
 });
 
 // 4. Update prices manually
 app.post("/api/prices", async (req, res) => {
   const { pin, data } = req.body;
   
-  if (!pin || !checkPin(String(pin))) {
-    return res.status(403).json({ error: "Sadece yetkili yöneticiler giriş yapabilir. Lütfen şifrenizi kontrol edin." });
-  }
+  try {
+    const isPinCorrect = await checkPin(String(pin));
+    if (!pin || !isPinCorrect) {
+      return res.status(403).json({ error: "Sadece yetkili yöneticiler giriş yapabilir. Lütfen şifrenizi kontrol edin." });
+    }
 
   if (!data || !Array.isArray(data.prices)) {
     return res.status(400).json({ error: "Gönderilen veri şablonu hatalı." });
@@ -496,9 +580,16 @@ app.post("/api/prices", async (req, res) => {
 app.post("/api/prices/analyze-image", async (req, res) => {
   const { pin, base64Image, mimeType } = req.body;
 
-  logToServer(`Attempting analyze-image. PIN matches: ${checkPin(String(pin))}. Base64 size: ${base64Image ? base64Image.length : 0} chars. Mime: ${mimeType}`);
+  let isPinCorrect = false;
+  try {
+    isPinCorrect = await checkPin(String(pin));
+  } catch (err) {
+    console.error("Error verifying PIN:", err);
+  }
 
-  if (!pin || !checkPin(String(pin))) {
+  logToServer(`Attempting analyze-image. PIN matches: ${isPinCorrect}. Base64 size: ${base64Image ? base64Image.length : 0} chars. Mime: ${mimeType}`);
+
+  if (!pin || !isPinCorrect) {
     logToServer("analyze-image: Auth failed. Invalid PIN.");
     return res.status(403).json({ error: "Yetkisiz erişim. Lütfen geçerli PIN kodu girin." });
   }
