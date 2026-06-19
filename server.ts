@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { initializeApp } from "firebase/app";
@@ -547,32 +546,35 @@ app.post("/api/prices", async (req, res) => {
       return res.status(403).json({ error: "Sadece yetkili yöneticiler giriş yapabilir. Lütfen şifrenizi kontrol edin." });
     }
 
-  if (!data || !Array.isArray(data.prices)) {
-    return res.status(400).json({ error: "Gönderilen veri şablonu hatalı." });
-  }
+    if (!data || !Array.isArray(data.prices)) {
+      return res.status(400).json({ error: "Gönderilen veri şablonu hatalı." });
+    }
 
-  try {
-    // Add lastUpdated fields automatically for audit log
-    const timestamp = new Date().toISOString();
-    const sanitisedPrices = data.prices.map((p: any) => ({
-      ...p,
-      buy: p.buy === "" || p.buy === undefined ? null : p.buy === null ? null : parseFloat(p.buy),
-      sell: p.sell === "" || p.sell === undefined ? null : p.sell === null ? null : parseFloat(p.sell),
-      lastUpdated: timestamp
-    }));
+    try {
+      // Add lastUpdated fields automatically for audit log
+      const timestamp = new Date().toISOString();
+      const sanitisedPrices = data.prices.map((p: any) => ({
+        ...p,
+        buy: p.buy === "" || p.buy === undefined ? null : p.buy === null ? null : parseFloat(p.buy),
+        sell: p.sell === "" || p.sell === undefined ? null : p.sell === null ? null : parseFloat(p.sell),
+        lastUpdated: timestamp
+      }));
 
-    const updatePayload = {
-      date: data.date || new Date().toLocaleDateString("tr-TR"),
-      title: data.title || "YAVUZLAR KUYUMCULUK",
-      subtitle: data.subtitle || "GÜNLÜK ALTIN FİYAT LİSTESİ",
-      note: data.note || "HAYIRLI İŞLER",
-      prices: sanitisedPrices
-    };
+      const updatePayload = {
+        date: data.date || new Date().toLocaleDateString("tr-TR"),
+        title: data.title || "YAVUZLAR KUYUMCULUK",
+        subtitle: data.subtitle || "GÜNLÜK ALTIN FİYAT LİSTESİ",
+        note: data.note || "HAYIRLI İŞLER",
+        prices: sanitisedPrices
+      };
 
-    await savePricesWithDatabase(updatePayload);
-    res.json({ success: true, message: "Fiyatlar başarıyla güncellendi!", data: updatePayload });
-  } catch (err: any) {
-    res.status(500).json({ error: "Değişiklikler kaydedilirken sunucu hatası oluştu.", details: err.message });
+      await savePricesWithDatabase(updatePayload);
+      res.json({ success: true, message: "Fiyatlar başarıyla güncellendi!", data: updatePayload });
+    } catch (err: any) {
+      res.status(500).json({ error: "Değişiklikler kaydedilirken sunucu hatası oluştu.", details: err.message });
+    }
+  } catch (outerErr: any) {
+    res.status(500).json({ error: "İşlem sırasında sunucu hatası oluştu.", details: outerErr.message });
   }
 });
 
@@ -771,6 +773,7 @@ async function startServer() {
   }
 
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
