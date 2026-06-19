@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Yavuzlar Kuyumculuk",
+  "description": "Zonguldak Çaycuma Yavuzlar Kuyumculuk canlı altın ve gümüş fiyatları paneli ve yapay zeka destekli yönetici fiyat giriş sistemi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "date": "11.06.2026",
+  "title": "YAVUZLAR KUYUMCULUK",
+  "subtitle": "GÜNLÜK ALTIN FİYAT LİSTESİ",
+  "note": "HAYIRLI İŞLER",
+  "prices": [
+    {
+      "id": "22_ayar",
+      "name": "22 Ayar",
+      "sell": 6000,
+      "buy": 5530,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "kalin_ceyrek",
+      "name": "Kalın çeyrek",
+      "sell": 10600,
+      "buy": 10200,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "ziynet_ceyrek_yeni",
+      "name": "Ziynet Çeyrek Yeni",
+      "sell": 10400,
+      "buy": 9800,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "ziynet_ceyrek_eski",
+      "name": "Ziynet Çeyrek Eski",
+      "sell": 10300,
+      "buy": 9800,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "tam_ziynet",
+      "name": "Tam Ziynet",
+      "sell": 40000,
+      "buy": 38700,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "kulplu_resat",
+      "name": "Kulplu Reşat",
+      "sell": 41800,
+      "buy": 40000,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "cumhuriyet",
+      "name": "Cumhuriyet",
+      "sell": 41400,
+      "buy": 40000,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "resat_besli",
+      "name": "Reşat Beşli",
+      "sell": 240000,
+      "buy": 210000,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "resat_half_besli",
+      "name": "Reşat 1/2 Y. Beşli",
+      "sell": 135000,
+      "buy": 110000,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    },
+    {
+      "id": "1gram_24_ayar",
+      "name": "1Gram 24 Ayar",
+      "sell": 6220,
+      "buy": 6050,
+      "lastUpdated": "2026-06-18T11:11:19.679Z"
+    }
+  ]
+}

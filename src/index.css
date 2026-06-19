@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "Cinzel", Georgia, serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-gold-50: #f8fafc;
+  --color-gold-100: #f1f5f9;
+  --color-gold-200: #e2e8f0;
+  --color-gold-300: #cbd5e1;
+  --color-gold-400: #94a3b8;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+  --color-gold-700: #b45309;
+  --color-gold-800: #78350f;
+  --color-gold-900: #451a03;
+  --color-gold-950: #0f172a;
+}
+
+/* Custom shimmering text effect & luxury design elements */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #f59e0b, #fef08a, #cbd5e1, #f59e0b);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 6s linear infinite;
+}
+
+/* Glassmorphism utility aligned with Slate Elegant Dark */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.glass-panel-light {
+  background: rgba(30, 41, 59, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.gold-gradient-border {
+  border-image: linear-gradient(to right, #1e293b, #f59e0b, #1e293b) 1;
+}
+
+/* Premium scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+/* ==========================================================================
+   Luxury Light Theme Color Scheme Overrides
+   ========================================================================== */
+.light {
+  background-color: #f8fafc !important; /* Soft white/slate backdrop */
+  color: #1e293b !important;
+}
+
+/* Force body / background container */
+.light .min-h-screen {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+/* Header & sub-interfaces */
+.light header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.light header nav,
+.light header .bg-slate-900\/40, 
+.light header .bg-slate-900\/50,
+.light header .bg-slate-900\/60 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light header button {
+  color: #475569 !important;
+}
+
+/* Active tab text inside lighter backgrounds */
+.light header button.bg-amber-500,
+.light nav button.bg-amber-500 {
+  background-color: #d97706 !important;
+  color: #ffffff !important;
+}
+
+.light header button.bg-amber-500 *,
+.light nav button.bg-amber-500 * {
+  color: #ffffff !important;
+}
+
+.light header button:hover {
+  color: #1e293b !important;
+}
+
+/* Footer style overrides */
+.light footer {
+  background-color: #ffffff !important;
+  border-top-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+.light footer .bg-slate-950\/40 {
+  background-color: rgba(241, 245, 249, 0.5) !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.light footer .bg-slate-950 {
+  background-color: #f1f5f9 !important;
+  border-top-color: #cbd5e1 !important;
+}
+
+.light footer h3 {
+  color: #1e293b !important;
+}
+
+/* General Layout Elements & Cards */
+.light .bg-slate-900,
+.light .bg-slate-900\/80,
+.light .bg-slate-900\/65,
+.light .bg-slate-900\/60,
+.light .bg-slate-900\/50,
+.light .bg-slate-900\/40,
+.light .bg-slate-900\/10,
+.light .bg-slate-950\/80,
+.light .bg-slate-950\/40,
+.light .bg-slate-950 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Subtle accent block inside containers */
+.light .bg-slate-950\/40,
+.light .bg-slate-950\/80,
+.light .bg-slate-950,
+.light .bg-slate-900/10 {
+  background-color: #f1f5f9 !important;
+}
+
+/* Font color rules */
+.light .text-white,
+.light .text-slate-50,
+.light .text-slate-100,
+.light .text-slate-200,
+.light .text-slate-300 {
+  color: #1e293b !important;
+}
+
+.light .text-slate-400,
+.light .text-slate-500,
+.light .text-slate-350 {
+  color: #475569 !important;
+}
+
+/* Highlight golden values & accents */
+.light .text-amber-500 {
+  color: #d97706 !important; /* Classy gold for light backgrounds */
+}
+
+.light .text-amber-400 {
+  color: #b45309 !important;
+}
+
+/* Glass panel */
+.light .glass-panel {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(217, 119, 6, 0.15) !important;
+}
+
+/* Tables style overrides */
+.light table {
+  background-color: #ffffff !important;
+}
+
+.light thead tr {
+  background-color: #f1f5f9 !important;
+  border-bottom-color: #cbd5e1 !important;
+}
+
+.light tbody tr {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.light tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+.light td span.bg-slate-950\/40 {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #475569 !important;
+}
+
+/* Control Buttons & Inputs */
+.light input,
+.light select,
+.light textarea {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.light input:focus,
+.light select:focus {
+  border-color: #d97706 !important;
+  outline: 2px solid rgba(217, 119, 6, 0.15) !important;
+}
+
+.light .border-slate-800,
+.light .border-slate-900,
+.light .border-slate-850 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Keep warning banner soft styled */
+.light .bg-amber-500\/10 {
+  background-color: rgba(217, 119, 6, 0.08) !important;
+  border-color: rgba(217, 119, 6, 0.2) !important;
+}
+
+.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+.light #theme-toggle-btn {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light #theme-toggle-btn:hover {
+  border-color: #d97706 !important;
+}
+
+/* Active buttons inside tabs */
+.light button.bg-slate-900:hover,
+.light button.bg-slate-900:not(:disabled) {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+.light .gold-gradient-border {
+  border-image: linear-gradient(to right, #cbd5e1, #d97706, #cbd5e1) 1 !important;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+

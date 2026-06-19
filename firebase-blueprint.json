@@ -1,0 +1,24 @@
+{
+  "entities": {
+    "Prices": {
+      "title": "Prices",
+      "description": "Gold prices dashboard state",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "note": { "type": "string" },
+        "prices": {
+          "type": "array"
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/prices/{documentId}": {
+      "schema": "Prices",
+      "description": "Store the current gold prices and headers"
+    }
+  }
+}
